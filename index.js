@@ -49,14 +49,14 @@ const pushHereProgram = program
   .description("pushes to the current branch")
   .argument("<message>", "the commit message")
   .action((message) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-
     if (message) {
       exec(`git add . && git commit -m "${message}" && git push`);
     } else {
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+      });
+
       rl.question("• Commit Message?: ", (name) => {
         console.log(chalk.green("[BOOM]") + " pushing to current branch");
         exec(`git add . && git commit -m "${name}" && git push`);
