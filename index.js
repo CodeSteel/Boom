@@ -65,6 +65,18 @@ const pushHereProgram = program
     }
   });
 
+const testProgram = program
+  .command("test")
+  .description("runs tests")
+  .argument("<test>", "the test to run")
+  .action((test) => {
+    if (test) {
+      console.log("Woah, what is " + test);
+    } else {
+      console.log("Just a simple test!");
+    }
+  });
+
 program.parse(process.argv);
 
 module.exports = { program };
