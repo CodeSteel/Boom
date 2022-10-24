@@ -47,6 +47,7 @@ const newIssueProgram = program
 const pushHereProgram = program
   .command("push")
   .description("pushes to the current branch")
+  .argument("<message>", "the commit message")
   .action((text) => {
     const rl = readline.createInterface({
       input: process.stdin,
