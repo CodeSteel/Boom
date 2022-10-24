@@ -4,7 +4,6 @@ const { program } = require("commander");
 const chalk = require("chalk");
 const readline = require("readline");
 const { exec } = require("child_process");
-// const { getURL, getRepository } = require("./git");
 
 const pingProgram = program
   .command("ping")
@@ -48,17 +47,21 @@ const newIssueProgram = program
 const pushHereProgram = program
   .command("push")
   .description("pushes to the current branch")
-  .action(() => {
+  .action((text) => {
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
     });
 
-    rl.question("• Commit Message?: ", (name) => {
-      console.log(chalk.green("[BOOM]") + " pushing to current branch");
-      exec(`git add . && git commit -m "${name}" && git push`);
-      rl.close();
-    });
+    if (text) {
+      exec(`git add . && git commit -m "${text}" && git push`);
+    } else {
+      rl.question("• Commit Message?: ", (name) => {
+        console.log(chalk.green("[BOOM]") + " pushing to current branch");
+        exec(`git add . && git commit -m "${name}" && git push`);
+        rl.close();
+      });
+    }
   });
 
 program.parse(process.argv);
