@@ -4,6 +4,7 @@ const { program } = require("commander");
 const chalk = require("chalk");
 const readline = require("readline");
 const { exec } = require("child_process");
+const {createNextProject} = require('./create-new-project');
 
 const pingProgram = program
   .command("ping")
@@ -331,6 +332,23 @@ const pullsProgram = program
       console.log(chalk.green("[BOOM]") + " opening PRs.");
     });
   });
+
+const newProjectProgram = program
+  .command("newproject")
+  .description("creates a new project")
+  .argument("[type]", "the type of project")
+  .argument("[name]", "the name of the project")
+  .action((type, name) => {
+    if (!name || !type) {
+      return;
+    }
+
+    switch(type) {
+      case "next":
+        console.log(chalk.red("[BOOM]") + ` creating next project '${name}'...`);
+        createNextProject(name);
+    }
+  }); 
 
 program.parse(process.argv);
 
