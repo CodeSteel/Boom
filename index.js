@@ -1,335 +1,125 @@
 #! /usr/bin/env node
-
 const { program } = require("commander");
 const chalk = require("chalk");
-const readline = require("readline");
-const { exec } = require("child_process");
+const { StartProject } = require("./features/start-project.js");
+const {
+  CreateIssue,
+  PullMain,
+  ResetHead,
+  SwitchBranch,
+  ShowBranches,
+  ShowIssues,
+  ShowPulls,
+  PushHere,
+} = require("./features/github.js");
 
-const pingProgram = program
+const log = (log) => console.log(`${chalk.red("[BOOM]")} ${log}`);
+
+program.addHelpCommand("help [command]", "Displays help for command.");
+program.addHelpText(
+  "afterAll",
+  `\nMore information at ${chalk.red("https://github.com/CodeSteel/Boom")}.`
+);
+
+const ping = program
   .command("ping")
-  .description("pings boom")
+  .description("Pings boom.")
   .action(() => {
-    console.log(chalk.green("BOOM") + " said pong!");
+    log("Pong!");
   });
 
-const newIssueProgram = program
+const switch_to_main = program
+  .command("main")
+  .description("Switches to the main branch.")
+  .action(() => {
+    SwitchBranch("main");
+  });
+
+const push_here = program
+  .command("push")
+  .argument("[commit]", "the commit message")
+  .description("Pushes the current branch to the remote.")
+  .action((commitMessage) => {
+    if (!commitMessage) {
+      log("No commit message provided!");
+      return;
+    }
+
+    PushHere(commitMessage);
+  });
+
+const start_project = program
+  .command("start")
+  .argument("[project]", "the name of the project")
+  .description(
+    "Start's a Create-Inc project. Only works for Create-Inc projects running on Windows."
+  )
+  .action(async (project) => {
+    await StartProject(project);
+    log(`Development environment '${project}' started.`);
+  });
+
+const show_pulls = program
+  .command("pulls")
+  .description("Shows all pull requests.")
+  .action(() => {
+    ShowPulls();
+  });
+
+const show_issues = program
+  .command("issues")
+  .description("Shows all issues.")
+  .action(() => {
+    ShowIssues();
+  });
+
+const new_issue = program
   .command("issue")
-  .description("creates a new issue")
+  .description("Creates a new issue.")
   .argument("[title]", "title of the issue")
   .action((title) => {
-    if (title) {
-      exec("git config --get remote.origin.url", (err, stdout, stderr) => {
-        if (err) {
-          return;
-        }
-
-        const urlTitle = title.replace(/ /g, "+");
-
-        if (typeof stdout === "string") {
-          let url = stdout.trim() + "/issues/new/" + "?title=" + urlTitle;
-          exec(`start ${url}`);
-        }
-      });
-      console.log(chalk.green("[BOOM]") + " created new issue!");
-    } else {
-      const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-      });
-
-      rl.question("• Issue Name?: ", (name) => {
-        exec("git config --get remote.origin.url", (err, stdout, stderr) => {
-          if (err) {
-            return;
-          }
-
-          if (typeof stdout === "string") {
-            const urlTitle = name.replace(/ /g, "+");
-
-            let url = stdout.trim() + "/issues/new/" + "?title=" + urlTitle;
-            exec(`start ${url}`);
-          }
-        });
-
-        console.log(chalk.green("[BOOM]") + " created new issue!");
-        rl.close();
-      });
+    if (!title) {
+      log("No title provided!");
+      return;
     }
+
+    CreateIssue(title);
   });
 
-const pushHereProgram = program
-  .command("push")
-  .description("pushes to the current branch")
-  .argument("[message]", "the commit message")
-  .action((message) => {
-    if (message) {
-      exec(`git add . && git commit -m "${message}" && git push`);
-      console.log(chalk.green("[BOOM]") + ` pushed to current branch!`);
-    } else {
-      const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-      });
-
-      rl.question("• Commit Message?: ", (name) => {
-        exec(`git add . && git commit -m "${name}" && git push`);
-        console.log(chalk.green("[BOOM]") + ` pushed to current branch!`);
-        rl.close();
-      });
-    }
-  });
-
-const pullHereProgramm = program
-  .command("pull")
-  .description("fetches latest and pulls from the current branch")
+const show_branches = program
+  .command("branches")
+  .description("Displays the current branch and lists all branches.")
   .action(() => {
-    exec(`git fetch && git pull`);
-    console.log(chalk.green("[BOOM]") + ` pulled from the latest!`);
+    ShowBranches();
   });
 
-const mergeMainProgram = program
-  .command("main")
-  .description("merges main into the current branch")
-  .action(() => {
-    exec(`git merge main`);
-    console.log(chalk.green("[BOOM]") + ` merged main into current branch!`);
-  });
-
-const resetHeadProgram = program
-  .command("resethead")
-  .description("resets the head to the latest commit")
-  .action(() => {
-    exec(`git reset --hard HEAD`);
-    console.log(chalk.green("[BOOM]") + ` reset head to latest commit!`);
-  });
-
-const newBranchProgram = program
-  .command("new")
-  .description("creates a new branch")
-  .argument("[branch]", "the name of the branch")
-  .action(async (branch) => {
-    let branchName = branch;
-
-    if (!branchName) {
-      const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-      });
-
-      rl.question("• Branch Name?: ", (name) => {
-        branchName = name;
-        exec(`git checkout -b ${branchName}`, () => {
-          console.log(
-            chalk.green("[BOOM]") +
-              ` created new branch ` +
-              chalk.blue(branchName) +
-              "!"
-          );
-        });
-        rl.close();
-      });
-    } else {
-      exec(`git checkout -b ${branchName}`, () => {
-        console.log(
-          chalk.green("[BOOM]") +
-            ` created new branch ` +
-            chalk.blue(branchName) +
-            "!"
-        );
-      });
-    }
-  });
-
-const switchBranchProgram = program
-  .command("switch")
-  .description("switches to a branch")
-  .argument("[branch]", "the name of the branch")
-  .action((branch) => {
-    let branchName = branch;
-
-    if (!branchName) {
-      const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-      });
-
-      rl.question("• Branch Name?: ", (name) => {
-        branchName = name;
-        exec(`git checkout ${branchName}`, (err, stdout, stderr) => {
-          if (err) {
-            console.log(chalk.red("[BOOM]") + " " + err);
-
-            const rl = readline.createInterface({
-              input: process.stdin,
-              output: process.stdout,
-            });
-
-            if (
-              err.message.includes("did not match any file(s) known to git")
-            ) {
-              rl.question("• Create Branch? (y/n): ", (name) => {
-                if (name.toLowerCase() === "y") {
-                  exec(`git checkout -b ${branchName}`, (err) => {
-                    if (err) {
-                      console.log(
-                        chalk.red("[BOOM]") + " error creating branch!"
-                      );
-                    }
-
-                    console.log(
-                      chalk.green("[BOOM]") +
-                        ` created new branch ` +
-                        chalk.blue(branchName) +
-                        "!"
-                    );
-
-                    return;
-                  });
-                }
-                rl.close();
-              });
-            }
-          } else {
-            console.log(
-              chalk.green("[BOOM]") +
-                ` switched to branch ` +
-                chalk.blue(branchName) +
-                "!"
-            );
-          }
-        });
-        rl.close();
-      });
-    } else {
-      exec(`git checkout ${branchName}`, (err, stdout, stderr) => {
-        if (err) {
-          console.log(chalk.red("[BOOM]") + " " + err);
-
-          const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout,
-          });
-
-          if (err.message.includes("did not match any file(s) known to git")) {
-            rl.question("• Create Branch? (y/n): ", (name) => {
-              if (name.toLowerCase() === "y") {
-                exec(`git checkout -b ${branchName}`, (err) => {
-                  if (err) {
-                    console.log(
-                      chalk.red("[BOOM]") + " error creating branch!"
-                    );
-                  }
-
-                  console.log(
-                    chalk.green("[BOOM]") +
-                      ` created new branch ` +
-                      chalk.blue(branchName) +
-                      "!"
-                  );
-
-                  return;
-                });
-              }
-              rl.close();
-            });
-          }
-        } else {
-          console.log(
-            chalk.green("[BOOM]") +
-              ` switched to branch ` +
-              chalk.blue(branchName) +
-              "!"
-          );
-        }
-      });
-    }
-  });
-
-const branchProgram = program
+const switch_branch = program
   .command("branch")
-  .description("shows the current branch and lists all branches")
-  .action(() => {
-    exec(`git branch`, (err, stdout, stderr) => {
-      if (err) {
-        console.log(chalk.red("[BOOM]") + " error getting branches!");
-      }
-
-      console.log(chalk.green("[BOOM]") + " showing branches:");
-      console.log(chalk.blue(stdout));
-    });
-  });
-
-const deleteBranchProgram = program
-  .command("delete")
-  .description("deletes a branch")
+  .description(
+    "Switches to a branch, or creates a new branch if it doesn't exist."
+  )
   .argument("[branch]", "the name of the branch")
   .action((branch) => {
     if (!branch) {
-      rl.question("• Branch Name?: ", (name) => {
-        if (name == "main") {
-          console.log(chalk.red("[BOOM]") + " cannot delete main branch!");
-          return;
-        }
-        exec(`git branch -d ${name}`, (err, stdout, stderr) => {
-          if (err) {
-            console.log(chalk.red("[BOOM]") + " error deleting branch!");
-            return;
-          }
-
-          console.log(
-            chalk.green("[BOOM]") + ` deleted branch ` + chalk.blue(name) + "!"
-          );
-        });
-        rl.close();
-      });
-    } else {
-      if (branch == "main") {
-        console.log(chalk.red("[BOOM]") + " cannot delete main branch!");
-        return;
-      }
-      exec(`git branch -d ${branch}`, (err, stdout, stderr) => {
-        if (err) {
-          console.log(chalk.red("[BOOM]") + " error deleting branch!");
-          return;
-        }
-
-        console.log(
-          chalk.green("[BOOM]") + ` deleted branch ` + chalk.blue(branch) + "!"
-        );
-      });
+      log("No branch name provided!");
+      return;
     }
+
+    SwitchBranch(branch);
   });
 
-const issuesProgram = program
-  .command("issues")
-  .description("shows all issues")
+const pull_main = program
+  .command("pullmain")
+  .description("Fetches latest and pulls from main.")
   .action(() => {
-    exec("git config --get remote.origin.url", (err, stdout, stderr) => {
-      if (err) return;
-
-      if (typeof stdout === "string") {
-        let url = stdout.trim() + "/issues/";
-        exec(`start ${url}`);
-      }
-
-      console.log(chalk.green("[BOOM]") + " opening issues.");
-    });
+    PullMain();
   });
 
-const pullsProgram = program
-  .command("pulls")
-  .description("shows all pull requests")
+const reset_head = program
+  .command("resethead")
+  .description("Resets the head to the latest commit.")
   .action(() => {
-    exec("git config --get remote.origin.url", (err, stdout, stderr) => {
-      if (err) return;
-
-      if (typeof stdout === "string") {
-        let url = stdout.trim() + "/pulls/";
-        exec(`start ${url}`);
-      }
-
-      console.log(chalk.green("[BOOM]") + " opening PRs.");
-    });
+    ResetHead();
   });
 
 program.parse(process.argv);
