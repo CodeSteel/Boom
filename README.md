@@ -2,6 +2,14 @@
 
 A Command Line Interface (CLI) tool to simplify and speed up common Github operations.
 
+## Installation
+
+### **yarn**
+`yarn global add @steelio/boom-cli`
+
+### **npm**
+`npm install -g @steelio/boom-cli`
+
 ## Commands
 
 ### **ping**
