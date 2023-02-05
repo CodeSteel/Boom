@@ -104,11 +104,14 @@ function PushHere(commitMessage) {
       .find((branch) => branch.includes("*"))
       .replace("* ", "");
 
+    console.log(`Current branch: '${currentBranch}'`);
+
     exec(
       `git add . && git commit -m "${commitMessage}" && git push origin ${currentBranch}`,
       (err, stdout, stderr) => {
         if (err) {
           log("Error pushing!");
+          return;
         }
 
         log(`Pushed to ${chalk.blue(currentBranch)}!`);
