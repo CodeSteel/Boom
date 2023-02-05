@@ -11,6 +11,7 @@ const {
   ShowIssues,
   ShowPulls,
   PushHere,
+  PullHere,
 } = require("./features/github.js");
 
 const log = (log) => console.log(`${chalk.red("[BOOM]")} ${log}`);
@@ -46,6 +47,13 @@ const push_here = program
     }
 
     PushHere(commitMessage);
+  });
+
+const pull_here = program
+  .command("pull")
+  .description("Pulls the latest changes from the remote.")
+  .action(() => {
+    PullHere();
   });
 
 const start_project = program

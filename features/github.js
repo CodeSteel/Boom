@@ -104,8 +104,6 @@ function PushHere(commitMessage) {
       .find((branch) => branch.includes("*"))
       .replace("* ", "");
 
-    console.log(`Current branch: '${currentBranch}'`);
-
     exec(
       `git add . && git commit -m "${commitMessage}" && git push origin ${currentBranch}`,
       (err, stdout, stderr) => {
@@ -133,6 +131,40 @@ function PushHere(commitMessage) {
   });
 }
 
+function PullHere() {
+  exec(`git branch`, (err, stdout, stderr) => {
+    if (err) {
+      log("Error getting branches!");
+    }
+
+    const branches = stdout.split("\n");
+    const currentBranch = branches
+      .find((branch) => branch.includes("*"))
+      .replace("* ", "");
+
+    exec(
+      `git fetch && git pull origin ${currentBranch}`,
+      (err, stdout, stderr) => {
+        if (err) {
+          if (
+            err.message.includes(
+              "Please commit your changes or stash them before you merge"
+            )
+          ) {
+            log("Please commit your changes or stash them before you merge.");
+            return;
+          }
+
+          log("Error pulling!");
+          return;
+        }
+
+        log(`Pulled from ${chalk.blue(currentBranch)}!`);
+      }
+    );
+  });
+}
+
 module.exports = {
   CreateIssue,
   PullMain,
@@ -142,4 +174,5 @@ module.exports = {
   ShowIssues,
   ShowPulls,
   PushHere,
+  PullHere,
 };
