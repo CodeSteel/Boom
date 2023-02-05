@@ -110,6 +110,19 @@ function PushHere(commitMessage) {
       `git add . && git commit -m "${commitMessage}" && git push origin ${currentBranch}`,
       (err, stdout, stderr) => {
         if (err) {
+          if (err.message.includes("nothing to commit, working tree clean")) {
+            log("Nothing to commit!");
+            return;
+          }
+          if (
+            err.message.includes(
+              "Updates were rejected because the tip of your current branch is behind"
+            )
+          ) {
+            log("Your current branch is behind, run 'boom pull' to update!");
+            return;
+          }
+
           log("Error pushing!");
           return;
         }
