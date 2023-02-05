@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 const { program } = require("commander");
 const chalk = require("chalk");
+<<<<<<< HEAD
 const { StartProject } = require("./features/start-project.js");
 const {
   CreateIssue,
@@ -23,6 +24,13 @@ program.addHelpText(
 );
 
 const ping = program
+=======
+const readline = require("readline");
+const { exec } = require("child_process");
+const {createNextProject} = require('./create-new-project');
+
+const pingProgram = program
+>>>>>>> c3f6ca6c7a7d966be718db486bd4cc00c54672e6
   .command("ping")
   .description("Pings boom.")
   .action(() => {
@@ -129,6 +137,23 @@ const reset_head = program
   .action(() => {
     ResetHead();
   });
+
+const newProjectProgram = program
+  .command("newproject")
+  .description("creates a new project")
+  .argument("[type]", "the type of project")
+  .argument("[name]", "the name of the project")
+  .action((type, name) => {
+    if (!name || !type) {
+      return;
+    }
+
+    switch(type) {
+      case "next":
+        console.log(chalk.red("[BOOM]") + ` creating next project '${name}'...`);
+        createNextProject(name);
+    }
+  }); 
 
 program.parse(process.argv);
 
