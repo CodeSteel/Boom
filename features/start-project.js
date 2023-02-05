@@ -1,4 +1,5 @@
 const { keyboard, Key, mouse, left, right, down } = require("@nut-tree/nut-js");
+const activeWindow = require("active-win");
 
 const openHorizontalPanel = [Key.LeftShift, Key.LeftAlt, Key.Equal];
 const openVerticalPanel = [Key.LeftShift, Key.LeftAlt, Key.Minus];
@@ -29,6 +30,23 @@ async function StartProject(project) {
   const directory = `${createDirectory}/${project}`;
 
   await RunCombo(openNewTerminal);
+
+  const activeWindows = await activeWindow.getOpenWindows();
+  const activeTerminals = activeWindows.filter(
+    (window) => window.owner.name === "WindowsTerminal.exe"
+  );
+  const mostRecentTerminal = activeTerminals[activeTerminals.length - 1];
+
+  if (!mostRecentTerminal) {
+    console.log("No active terminal found!");
+    return false;
+  }
+
+  await mouse.setPosition({
+    x: mostRecentTerminal.bounds.x + mostRecentTerminal.bounds.width / 2,
+    y: mostRecentTerminal.bounds.y + mostRecentTerminal.bounds.height / 2,
+  });
+
   setTimeout(async () => {
     // start docker container
     await Type(`cd ${directory}/api`);
