@@ -1,18 +1,23 @@
 {
-  "name": "Boom",
-  "version": "1.0.1",
+  "name": "@steelio/boom-cli",
+  "version": "1.0.2",
+  "author": "Isaac Holloway",
+  "homepage": "https://github.com/CodeSteel/Boom",
+  "bugs": {
+    "url": "https://github.com/CodeSteel/Boom/issues"
+  },
   "dependencies": {
     "@nut-tree/nut-js": "^3.0.1-next.20230124085453",
     "chalk": "^4.1.2",
     "commander": "^9.4.1",
     "robotjs": "^0.6.0"
   },
+  "license": "MIT",
   "bin": {
     "boom": "./index.js"
   },
   "scripts": {
-    "boom": "node index.js",
-    "test": "node devmode.js"
+    "boom": "node index.js"
   },
   "module": "index.js"
 }
