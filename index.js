@@ -1,7 +1,6 @@
 #! /usr/bin/env node
 const { program } = require("commander");
 const chalk = require("chalk");
-<<<<<<< HEAD
 const { StartProject } = require("./features/start-project.js");
 const {
   CreateIssue,
@@ -14,6 +13,7 @@ const {
   PushHere,
   PullHere,
 } = require("./features/github.js");
+const { CreateNextProject } = require("./features/create-new-project.js");
 
 const log = (log) => console.log(`${chalk.red("[BOOM]")} ${log}`);
 
@@ -23,14 +23,7 @@ program.addHelpText(
   `\nMore information at ${chalk.red("https://github.com/CodeSteel/Boom")}.`
 );
 
-const ping = program
-=======
-const readline = require("readline");
-const { exec } = require("child_process");
-const {createNextProject} = require('./create-new-project');
-
 const pingProgram = program
->>>>>>> c3f6ca6c7a7d966be718db486bd4cc00c54672e6
   .command("ping")
   .description("Pings boom.")
   .action(() => {
@@ -138,22 +131,28 @@ const reset_head = program
     ResetHead();
   });
 
-const newProjectProgram = program
+const new_project = program
   .command("newproject")
-  .description("creates a new project")
+  .description("Creates a new project.")
   .argument("[type]", "the type of project")
   .argument("[name]", "the name of the project")
   .action((type, name) => {
-    if (!name || !type) {
+    if (!name) {
+      log("No project name provided!");
       return;
     }
 
-    switch(type) {
-      case "next":
-        console.log(chalk.red("[BOOM]") + ` creating next project '${name}'...`);
-        createNextProject(name);
+    if (!type) {
+      log("No project type provided!");
+      return;
     }
-  }); 
+
+    switch (type) {
+      case "next":
+        log(`Creating next project '${name}'...`);
+        CreateNextProject(name);
+    }
+  });
 
 program.parse(process.argv);
 
