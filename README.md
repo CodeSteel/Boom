@@ -5,9 +5,11 @@ A Command Line Interface (CLI) tool to simplify and speed up common Github opera
 ## Installation
 
 ### **yarn**
+
 `yarn global add @steelio/boom-cli`
 
 ### **npm**
+
 `npm install -g @steelio/boom-cli`
 
 ## Commands
@@ -30,7 +32,7 @@ Retrieves the latest changes from the remote repository and updates the current 
 
 ### **start [project]**
 
-Starts a Create-Inc project. Only works for Create-Inc projects running on Windows. Optionally, you can specify a `project` name.
+Start's a project environment. Only works on Windows. Make sure your cursor is at the center of the newly opened terminal window.
 
 ### **pulls**
 
@@ -59,10 +61,6 @@ Fetches the latest changes from the remote repository and pulls the updated `mai
 ### **resethead**
 
 Resets the head of the current branch to the latest commit.
-
-### **newproject [type] [name]**
-
-Creates a new project of a specified `type` with a specified `name`.
 
 ### **help [command]**
 
