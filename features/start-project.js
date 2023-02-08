@@ -27,8 +27,6 @@ async function Type(prompt) {
 }
 
 async function StartProject(project) {
-  const directory = `${createDirectory}/${project}`;
-
   await RunCombo(openNewTerminal);
 
   const activeWindows = await activeWindow.getOpenWindows();
@@ -49,21 +47,21 @@ async function StartProject(project) {
 
   setTimeout(async () => {
     // start docker container
-    await Type(`cd ${directory}/api`);
+    await Type(`cd ${project}/api`);
     await Type("yarn docker:compose");
 
     // start web
     await RunCombo(openHorizontalPanel);
     setTimeout(async () => {
       await mouse.move(right(moveMouseAmount));
-      await Type(`cd ${directory}/web`);
+      await Type(`cd ${project}/web`);
       await Type("yarn dev");
 
       // start storybook
       RunCombo(openVerticalPanel);
       setTimeout(async () => {
         await mouse.move(down(moveMouseAmount));
-        await Type(`cd ${directory}/web`);
+        await Type(`cd ${project}/web`);
         await Type("yarn storybook");
 
         // start vscode
@@ -71,7 +69,7 @@ async function StartProject(project) {
 
         RunCombo(openVerticalPanel);
         setTimeout(async () => {
-          await Type(`cd ${directory}/`);
+          await Type(`cd ${project}/`);
           await Type("code .");
         }, createNewPaneDelay);
       }, createNewPaneDelay);

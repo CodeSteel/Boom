@@ -59,9 +59,9 @@ const pull_here = program
 
 const start_project = program
   .command("start")
-  .argument("[project]", "the name of the project")
+  .argument("[project]", "the directory to the project")
   .description(
-    "Start's a Create-Inc project. Only works for Create-Inc projects running on Windows."
+    "Start's a project environment. Only works on Windows. Make sure your cursor is at the center of the newly opened terminal window."
   )
   .action(async (project) => {
     await StartProject(project);
@@ -129,29 +129,6 @@ const reset_head = program
   .description("Resets the head to the latest commit.")
   .action(() => {
     ResetHead();
-  });
-
-const new_project = program
-  .command("newproject")
-  .description("Creates a new project.")
-  .argument("[type]", "the type of project")
-  .argument("[name]", "the name of the project")
-  .action((type, name) => {
-    if (!name) {
-      log("No project name provided!");
-      return;
-    }
-
-    if (!type) {
-      log("No project type provided!");
-      return;
-    }
-
-    switch (type) {
-      case "next":
-        log(`Creating next project '${name}'...`);
-        CreateNextProject(name);
-    }
   });
 
 program.parse(process.argv);
