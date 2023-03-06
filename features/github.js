@@ -3,7 +3,7 @@ const chalk = require("chalk");
 
 const log = (log) => console.log(`${chalk.red("[BOOM]")} ${log}`);
 
-function CreateIssue() {
+function CreateIssue(title) {
   exec("git config --get remote.origin.url", (err, stdout) => {
     if (err) {
       return;
